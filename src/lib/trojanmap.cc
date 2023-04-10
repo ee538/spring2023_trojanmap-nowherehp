@@ -60,6 +60,10 @@ std::string TrojanMap::GetID(const std::string &name) {
   return res;
 }
 
+
+
+
+// phase1
 /**
  * GetPosition: Given a location name, return the position. If id does not
  * exist, return (-1, -1).
@@ -68,9 +72,38 @@ std::string TrojanMap::GetID(const std::string &name) {
  * @return {std::pair<double,double>}  : (lat, lon)
  */
 std::pair<double, double> TrojanMap::GetPosition(std::string name) {
+  // Remove extra spaces around the dot operator
+  std::transform(name.begin(), name.end(), name.begin(), ::tolower); 
+
+  // Remove the duplicate declaration of `results`
   std::pair<double, double> results(-1, -1);
+
+  if (name.empty()) return results;
+  auto it = std::find_if(data.begin(), data.end(), [&name](const std::pair<std::string, Node>& datum) { 
+    std::string lowercase_name(datum.second.name);
+    std::transform(lowercase_name.begin(), lowercase_name.end(), lowercase_name.begin(), ::tolower);
+
+    // Compare the transformed lowercase names instead of the original names
+    return lowercase_name == name;
+  });
+  if (it != data.end()) results = {it->second.lat, it->second.lon};
+
   return results;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * CalculateEditDistance: Calculate edit distance between two location names
@@ -94,6 +127,11 @@ std::string TrojanMap::FindClosestName(std::string name) {
   return tmp;
 }
 
+
+
+
+
+// phase1
 /**
  * Autocomplete: Given a parital name return all the possible locations with
  * partial name as the prefix. The function should be case-insensitive.
@@ -103,8 +141,38 @@ std::string TrojanMap::FindClosestName(std::string name) {
  */
 std::vector<std::string> TrojanMap::Autocomplete(std::string name) {
   std::vector<std::string> results;
-  return results;
+  std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+  for (const auto& node : data) {
+    std::string node_name;
+    std::transform(node.second.name.begin(), node.second.name.end(), std::back_inserter(node_name), ::tolower);
+    
+    if (node_name.find(name) == 0) {
+      results.push_back(node.second.name);
+    }
+  }
+
+  return results; 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * GetAllCategories: Return all the possible unique location categories, i.e.
