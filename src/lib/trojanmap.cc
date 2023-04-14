@@ -44,8 +44,14 @@ std::string TrojanMap::GetName(const std::string &id) {
  * @return {std::vector<std::string>}  : neighbor ids
  */
 std::vector<std::string> TrojanMap::GetNeighborIDs(const std::string &id) {
-  return {};
+  auto it = data.find(id);
+  if (it == data.end()) {
+    return {}; // If the id is not in the data map, return an empty vector.
+  }
+
+  return it->second.neighbors; // Return the neighbors vector of the Node object associated with the given id.
 }
+
 
 /**
  * GetID: Given a location name, return the id.
@@ -410,7 +416,24 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(
  * @return {bool}                      : in square or not
  */
 bool TrojanMap::inSquare(std::string id, std::vector<double> &square) {
-  return true;
+  auto it = data.find(id);
+  if (it == data.end()) {
+    return false; // If the id is not in the data map, return false.
+  }
+
+  Node node = it->second; // Get the Node object associated with the given id safely
+  double lon_left = square[0];
+  double lon_right = square[1];
+  double lat_upper = square[2];
+  double lat_lower = square[3];
+
+  // Check if the node's longitude and latitude are within the bounds.
+  if (node.lon >= lon_left && node.lon <= lon_right &&
+      node.lat >= lat_lower && node.lat <= lat_upper) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 
@@ -426,6 +449,12 @@ bool TrojanMap::inSquare(std::string id, std::vector<double> &square) {
 std::vector<std::string> TrojanMap::GetSubgraph(std::vector<double> &square) {
   // include all the nodes in subgraph
   std::vector<std::string> subgraph;
+  for (const auto &id_node_pair : data) {
+    std::string id = id_node_pair.first;
+    if (inSquare(id, square)) {
+      subgraph.push_back(id);
+    }
+  }
   return subgraph;
 }
 
@@ -439,8 +468,52 @@ std::vector<std::string> TrojanMap::GetSubgraph(std::vector<double> &square) {
  * @return {bool}: whether there is a cycle or not
  */
 bool TrojanMap::CycleDetection(std::vector<std::string> &subgraph, std::vector<double> &square) {
-  return false;
+  std::unordered_set<std::string> visited;         // Set to track visited nodes
+  std::unordered_set<std::string> recursion_stack; // Set to track nodes in the current recursion
+
+  // Iterate through the nodes in the subgraph
+  for (const std::string &node_id : subgraph) {
+    if (visited.find(node_id) == visited.end()) { // If the node is not visited
+      if (dfs(node_id, visited, recursion_stack)) { // Perform DFS on the node
+        return true; // Return true if a cycle is detected
+      }
+    }
+  }
+
+  return false; // No cycle detected in the subgraph, return false
 }
+
+bool TrojanMap::dfs(const std::string &node_id, std::unordered_set<std::string> &visited, std::unordered_set<std::string> &recursion_stack) {
+  visited.insert(node_id); // Mark the current node as visited
+  recursion_stack.insert(node_id); // Add the current node to the recursion stack
+
+  // Iterate through the neighbors of the current node
+  for (const std::string &neighbor_id : GetNeighborIDs(node_id)) {
+    if (visited.find(neighbor_id) == visited.end()) { // If the neighbor is not visited
+      if (dfs(neighbor_id, visited, recursion_stack)) { // Recursively perform DFS on the neighbor
+        return true; // Return true if a cycle is detected
+      }
+    } else if (recursion_stack.find(neighbor_id) != recursion_stack.end()) { // If the neighbor is already in the recursion stack
+      return true; // A cycle is detected, return true
+    }
+  }
+
+  recursion_stack.erase(node_id); // Remove the current node from the recursion stack
+  return false; // No cycle detected, return false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * FindNearby: Given a class name C, a location name L and a number r,
