@@ -137,8 +137,35 @@ std::pair<double, double> TrojanMap::GetPosition(std::string name) {
  * @param  {std::string} b          : second string
  * @return {int}                    : edit distance between two strings
  */
-int TrojanMap::CalculateEditDistance(std::string a, std::string b) {     
-  return 0;
+
+
+int TrojanMap::CalculateEditDistance(std::string a, std::string b) {
+ std::transform(a.begin(),a.end(),a.begin(),::tolower);
+ std::transform(b.begin(),b.end(),b.begin(),::tolower);
+ if(a == b){
+   return 0;
+ }
+ int m = a.length();
+ int n = b.length();
+ int distancePossible[m+1][n+1];
+ for(int i = 0;i<= m; i++){
+   distancePossible[i][0] = i;
+ }
+ for(int i = 0;i<=n;i++){
+   distancePossible[0][i] = i;
+ }
+ for(int i =1; i<=m;i++){
+   for(int j =1 ;j<=n; j++){
+     if(a[i-1] == b [j-1]){
+       distancePossible[i][j] = distancePossible[i-1][j-1];
+     }else{
+       distancePossible[i][j] =std::min(distancePossible[i-1][j],std::min(distancePossible[i-1][j-1],distancePossible[i][j-1]))+1;
+     }
+   }
+ }
+
+
+ return distancePossible[m][n];
 }
 
 //phase2
@@ -150,9 +177,21 @@ int TrojanMap::CalculateEditDistance(std::string a, std::string b) {
  * @return {std::string} tmp           : the closest name
  */
 std::string TrojanMap::FindClosestName(std::string name) {
-  std::string tmp = ""; // Start with a dummy word
-  return tmp;
+ std::string tmp = ""; // Start with a dummy word
+ int distance = INT_MAX;
+ for(auto it  = data.begin(); it != data.end();it++){
+   if(it->second.name.empty()){
+     continue;
+   }
+   int distance_between_two_place = CalculateEditDistance(name, it->second.name);
+   if(distance_between_two_place < distance){
+     distance = distance_between_two_place;
+     tmp = it->second.name;
+   }
+ }
+ return tmp;
 }
+
 
 
 
@@ -192,7 +231,19 @@ std::vector<std::string> TrojanMap::Autocomplete(std::string name) {
  * @return {std::vector<std::string>}  : all unique location categories
  */
 std::vector<std::string> TrojanMap::GetAllCategories() {
-  return {};
+ std::set<std::string> CategoriesSet;
+ for(auto it = data.begin();it != data.end();it++){
+   if(it->second.attributes.empty()){
+     continue;
+   }else{
+     CategoriesSet.insert(*it->second.attributes.begin());
+   }
+ }
+ std::vector<std::string> result;
+ for(auto x = CategoriesSet.begin(); x != CategoriesSet.end();x++){
+   result.push_back(*x);
+ }
+ return result;
 }
 
 //phase2
@@ -205,9 +256,24 @@ std::vector<std::string> TrojanMap::GetAllCategories() {
  * @return {std::vector<std::string>}     : ids
  */
 std::vector<std::string> TrojanMap::GetAllLocationsFromCategory(
-    std::string category) {
-  std::vector<std::string> res;
-  return res;
+   std::string category) {
+ std::vector<std::string> res;
+ std::transform(category.begin(),category.end(),category.begin(),::tolower);
+ for(auto x = data.begin();x != data.end(); x++){
+   if(x->second.attributes.empty()){
+     continue;
+   }else{
+     std::string CategoryName = *x->second.attributes.begin();
+     std::transform(CategoryName.begin(),CategoryName.end(),CategoryName.begin(),::tolower);
+     if(CategoryName == category){
+       res.push_back(x->first);
+     }
+   }
+ }
+ if(res.empty()){
+   return{"-1"};
+ }
+ return res;
 }
 
 
@@ -222,7 +288,13 @@ std::vector<std::string> TrojanMap::GetAllLocationsFromCategory(
  * @return {std::vector<std::string>}     : ids
  */
 std::vector<std::string> TrojanMap::GetLocationRegex(std::regex location) {
-  return {};
+ std::vector<std::string> result;
+ for(auto x = data.begin();x != data.end(); x++){
+   if(std::regex_match(x->second.name,location)){
+     result.push_back(x->first);
+   }
+ }
+ return result;
 }
 
 /**
