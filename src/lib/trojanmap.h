@@ -158,10 +158,7 @@ class TrojanMap {
                       std::vector<double> &square);
 
   //dfs
-  bool dfs(const std::string &node_id, std::unordered_set<std::string> &visited, 
-           std::unordered_set<std::string> &recursion_stack);
-
-
+  bool dfs(std::string current_id,std::unordered_map<std::string, bool> &visited, std::string parent_id);
   // Given a location id and k, find the k closest points on the map
   std::vector<std::string> FindNearby(std::string, std::string, double, int);
   

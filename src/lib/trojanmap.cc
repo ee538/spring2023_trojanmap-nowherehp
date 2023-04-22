@@ -683,44 +683,38 @@ std::vector<std::string> TrojanMap::GetSubgraph(std::vector<double> &square) {
  * @return {bool}: whether there is a cycle or not
  */
 bool TrojanMap::CycleDetection(std::vector<std::string> &subgraph, std::vector<double> &square) {
-  std::unordered_set<std::string> visited;         // Set to track visited nodes
-  std::unordered_set<std::string> recursion_stack; // Set to track nodes in the current recursion
+   std::unordered_map<std::string, bool> visited;
 
-  // Iterate through the nodes in the subgraph
-  for (const std::string &it : subgraph) {
-    if (visited.find(it) == visited.end()) { // If the node is not visited
-      if (dfs(it, visited, recursion_stack)) { // Perform DFS on the node
-        return true; // Return true if a cycle is detected
+  for(auto it:subgraph){
+    visited[it] = false;
+  }
+
+  for(auto it:subgraph){
+    if(visited[it] == false){
+      if (dfs(it,visited,"")){
+        return true;
       }
     }
   }
-
-  return false; // No cycle detected in the subgraph, return false
+  return false;
 }
 
-//phase2
-bool TrojanMap::dfs(const std::string &node_id, std::unordered_set<std::string> &visited, std::unordered_set<std::string> &recursion_stack) {
-  visited.insert(node_id); // Mark the current node as visited
-  recursion_stack.insert(node_id); // Add the current node to the recursion stack
 
-  // Iterate through the neighbors of the current node
-  for (const std::string &neighbor_id : GetNeighborIDs(node_id)) {
-    if (visited.find(neighbor_id) == visited.end()) { // If the neighbor is not visited
-      if (dfs(neighbor_id, visited, recursion_stack)) { // Recursively perform DFS on the neighbor
-        return true; // Return true if a cycle is detected
+bool TrojanMap::dfs(std::string current_id,std::unordered_map<std::string, bool> &visited, std::string parent_id){
+  visited[current_id] = true;
+  for(auto n:data[current_id].neighbors){
+    if(visited.find(n) != visited.end()){ //to check if the neighbor is in the area
+      if(visited[n] == false){
+        if(dfs(n,visited,current_id)){
+          return true;
+        }
+      }else if((n!=parent_id) && (visited[n]== true)){
+          return true;
       }
-    } else if (recursion_stack.find(neighbor_id) != recursion_stack.end()) { // If the neighbor is already in the recursion stack
-      return true; // A cycle is detected, return true
     }
   }
-
-  recursion_stack.erase(node_id); // Remove the current node from the recursion stack
-  return false; // No cycle detected, return false
+  return false;
 }
-
-
-
-
 
 
 
