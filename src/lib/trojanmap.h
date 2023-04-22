@@ -67,6 +67,9 @@ class TrojanMap {
   // Get the id given its name.
   std::string GetID(const std::string &name);
 
+  //find the locaion exsit or not
+  bool FindLocationName(std::string location);
+
   // Get the neighbor ids of a Node.
   std::vector<std::string> GetNeighborIDs(const std::string &id);
 
@@ -118,6 +121,10 @@ class TrojanMap {
   std::vector<std::string> DeliveringTrojan(
       std::vector<std::string> &location_names,
       std::vector<std::vector<std::string>> &dependencies);
+  
+  void DFS_Helper(std::string location, std::map<std::string, bool>& visited, 
+                          std::unordered_map<std::string, std::vector<std::string> >&graph, 
+                          std::vector<std::string>& result);
 
   // Given a vector of location ids, it should reorder them such that the path
   // that covers all these points has the minimum length.
