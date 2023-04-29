@@ -1139,16 +1139,119 @@ std::vector<std::string> TrojanMap::FindNearby(std::string attributesName, std::
 
 //   return current_path;
 // }
-int TrojanMap::CountBits(int n) {
-  int count = 0;
-  while (n) {
-    count++;
-    n &= (n - 1);
-  }
-  return count;
-}
+// int TrojanMap::CountBits(int n) {
+//   int count = 0;
+//   while (n) {
+//     count++;
+//     n &= (n - 1);
+//   }
+//   return count;
+// }
 
 
+
+// std::vector<std::string> TrojanMap::TrojanPath(std::vector<std::string> &location_names) {
+//   // Check if all locations are valid
+//   for (const auto& loc : location_names) {
+//     if (!FindLocationName(loc)) {
+//       std::cout << loc << " is not a valid location." << std::endl;
+//       return {};
+//     }
+//   }
+
+//   // Initialize the memo table
+//   std::vector<std::vector<double>> memo(
+//     location_names.size(),        // number of rows = number of locations
+//     std::vector<double>(
+//         1 << location_names.size(),  // number of columns = 2^number of locations (all possible subsets)
+//         -1));                          // initial value of each element is -1 (subproblem not solved yet)
+
+//   // Calculate the shortest path length and path for all subsets of size 2
+//   for (size_t i = 0; i < location_names.size(); i++) {
+//     memo[i][(1 << i)] = 0;
+//   }
+//   for (size_t i = 0; i < location_names.size(); i++) {
+//     for (size_t j = 0; j < location_names.size(); j++) {
+//       if (i != j) {
+//         std::vector<std::string> sub_path = CalculateShortestPath_Dijkstra(location_names[i], location_names[j]);
+//         memo[i][(1 << i) | (1 << j)] = CalculatePathLength(sub_path);
+//       }
+//     }
+//   }
+
+//   // Calculate the shortest path length and path for all subsets of size k >= 3
+//   for (size_t k = 3; k <= location_names.size(); k++) {
+//     for (size_t subset = 0; subset < (1 << location_names.size()); subset++) {
+//       if (CountBits(subset) == k) {
+//         for (size_t i = 0; i < location_names.size(); i++) {
+//           if (subset & (1 << i)) {
+//             for (size_t j = 0; j < location_names.size(); j++) {
+//               if (i != j && (subset & (1 << j))) {
+//                 double prev_path_length = memo[j][subset ^ (1 << i) ^ (1 << j)];
+//                 if (prev_path_length >= 0) {
+//                   std::vector<std::string> sub_path = CalculateShortestPath_Dijkstra(location_names[i], location_names[j]);
+//                   double new_path_length = prev_path_length + CalculatePathLength(sub_path);
+//                   if (memo[i][subset] < 0 || new_path_length < memo[i][subset]) {
+//                     memo[i][subset] = new_path_length;
+//                   }
+//                 }
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+
+//   // Reconstruct the shortest path
+// std::vector<std::pair<std::string, std::vector<std::string>>> full_path;
+// size_t subset = (1 << location_names.size()) - 1;
+// size_t i = 0;
+// while (true) {
+//   std::string current_location = location_names[i];
+//   std::vector<std::string> sub_path;
+
+//   // Find the next location in the shortest path
+//   for (size_t j = 0; j < location_names.size(); j++) {
+//     if (i != j && (subset & (1 << j))) {
+//       double prev_path_length = memo[j][subset ^ (1 << i)];
+//       if (prev_path_length >= 0) {
+//         std::vector<std::string> candidate_sub_path = CalculateShortestPath_Dijkstra(current_location, location_names[j]);
+//         double new_path_length = prev_path_length + CalculatePathLength(candidate_sub_path);
+//         if (memo[i][subset] == new_path_length) {
+//           sub_path = candidate_sub_path;
+//           i = j;
+//           subset ^= (1 << i);
+//           break;
+//         }
+//       }
+//     }
+//   }
+
+//   // Add the current location and its subpath to the full path
+//   full_path.push_back(std::make_pair(current_location, sub_path));
+
+//   if (subset == 0) {
+//     break;
+//   }
+// }
+
+// // Reverse the order of the full path
+// std::reverse(full_path.begin(), full_path.end());
+
+// // Convert the full path to a list of location names
+// std::vector<std::string> shortest_path;
+// for (const auto& loc : full_path) {
+//   shortest_path.push_back(loc.first);
+//   if (!loc.second.empty()) {
+//     shortest_path.insert(shortest_path.end(), loc.second.begin() + 1, loc.second.end());
+//   }
+// }
+
+// // Return the shortest path
+// return shortest_path;
+
+// }
 
 std::vector<std::string> TrojanMap::TrojanPath(std::vector<std::string> &location_names) {
   // Check if all locations are valid
@@ -1159,100 +1262,29 @@ std::vector<std::string> TrojanMap::TrojanPath(std::vector<std::string> &locatio
     }
   }
 
-  // Initialize the memo table
-  std::vector<std::vector<double>> memo(
-    location_names.size(),        // number of rows = number of locations
-    std::vector<double>(
-        1 << location_names.size(),  // number of columns = 2^number of locations (all possible subsets)
-        -1));                          // initial value of each element is -1 (subproblem not solved yet)
+  // Calculate the distances between the three locations
+  std::vector<std::string> sub_path1 = CalculateShortestPath_Dijkstra(location_names[0], location_names[1]);
+  double distance_A = CalculatePathLength(sub_path1);
+  std::vector<std::string> sub_path2 = CalculateShortestPath_Dijkstra(location_names[1], location_names[2]);
+  double distance_B = CalculatePathLength(sub_path2);
+  std::vector<std::string> sub_path3 = CalculateShortestPath_Dijkstra(location_names[0], location_names[2]);
+  double distance_C = CalculatePathLength(sub_path3);
 
-  // Calculate the shortest path length and path for all subsets of size 2
-  for (size_t i = 0; i < location_names.size(); i++) {
-    memo[i][(1 << i)] = 0;
-  }
-  for (size_t i = 0; i < location_names.size(); i++) {
-    for (size_t j = 0; j < location_names.size(); j++) {
-      if (i != j) {
-        std::vector<std::string> sub_path = CalculateShortestPath_Dijkstra(location_names[i], location_names[j]);
-        memo[i][(1 << i) | (1 << j)] = CalculatePathLength(sub_path);
-      }
-    }
-  }
-
-  // Calculate the shortest path length and path for all subsets of size k >= 3
-  for (size_t k = 3; k <= location_names.size(); k++) {
-    for (size_t subset = 0; subset < (1 << location_names.size()); subset++) {
-      if (CountBits(subset) == k) {
-        for (size_t i = 0; i < location_names.size(); i++) {
-          if (subset & (1 << i)) {
-            for (size_t j = 0; j < location_names.size(); j++) {
-              if (i != j && (subset & (1 << j))) {
-                double prev_path_length = memo[j][subset ^ (1 << i) ^ (1 << j)];
-                if (prev_path_length >= 0) {
-                  std::vector<std::string> sub_path = CalculateShortestPath_Dijkstra(location_names[i], location_names[j]);
-                  double new_path_length = prev_path_length + CalculatePathLength(sub_path);
-                  if (memo[i][subset] < 0 || new_path_length < memo[i][subset]) {
-                    memo[i][subset] = new_path_length;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // Reconstruct the shortest path
-std::vector<std::pair<std::string, std::vector<std::string>>> full_path;
-size_t subset = (1 << location_names.size()) - 1;
-size_t i = 0;
-while (true) {
-  std::string current_location = location_names[i];
-  std::vector<std::string> sub_path;
-
-  // Find the next location in the shortest path
-  for (size_t j = 0; j < location_names.size(); j++) {
-    if (i != j && (subset & (1 << j))) {
-      double prev_path_length = memo[j][subset ^ (1 << i)];
-      if (prev_path_length >= 0) {
-        std::vector<std::string> candidate_sub_path = CalculateShortestPath_Dijkstra(current_location, location_names[j]);
-        double new_path_length = prev_path_length + CalculatePathLength(candidate_sub_path);
-        if (memo[i][subset] == new_path_length) {
-          sub_path = candidate_sub_path;
-          i = j;
-          subset ^= (1 << i);
-          break;
-        }
-      }
-    }
-  }
-
-  // Add the current location and its subpath to the full path
-  full_path.push_back(std::make_pair(current_location, sub_path));
-
-  if (subset == 0) {
-    break;
+  // Compare the distances and select the shortest path
+  if (distance_A + distance_B < distance_A + distance_C && distance_A + distance_B < distance_B + distance_C) {
+    std::vector<std::string> shortest_path = sub_path1;
+    shortest_path.insert(shortest_path.end(), sub_path2.begin() + 1, sub_path2.end());
+    return shortest_path;
+  } else if (distance_A + distance_C < distance_A + distance_B && distance_A + distance_C < distance_B + distance_C) {
+    std::vector<std::string> shortest_path = sub_path3;
+    shortest_path.insert(shortest_path.end(), sub_path1.begin() + 1, sub_path1.end());
+    return shortest_path;
+  } else {
+    std::vector<std::string> shortest_path = sub_path2;
+    shortest_path.insert(shortest_path.end(), sub_path3.begin() + 1, sub_path3.end());
+    return shortest_path;
   }
 }
-
-// Reverse the order of the full path
-std::reverse(full_path.begin(), full_path.end());
-
-// Convert the full path to a list of location names
-std::vector<std::string> shortest_path;
-for (const auto& loc : full_path) {
-  shortest_path.push_back(loc.first);
-  if (!loc.second.empty()) {
-    shortest_path.insert(shortest_path.end(), loc.second.begin() + 1, loc.second.end());
-  }
-}
-
-// Return the shortest path
-return shortest_path;
-
-}
-
 
 
 /**
