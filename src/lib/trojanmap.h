@@ -50,14 +50,6 @@ private:
 
 
 
-
-
-
-
-
-
-
-
 // A Node is the location of one point in the map.
 class Node {
  public:
@@ -106,10 +98,6 @@ class TrojanMap {
   // Get the id given its name.
   std::string GetID(const std::string &name);
 
-  //find the locaion exsit or not
-  bool FindLocationName(std::string location);
-
-  std::vector<std::string> GetAllLocationIDs();
 
   // Get the neighbor ids of a Node.
   std::vector<std::string> GetNeighborIDs(const std::string &id);
@@ -163,9 +151,7 @@ class TrojanMap {
       std::vector<std::string> &location_names,
       std::vector<std::vector<std::string>> &dependencies);
   
-  void DFS_Helper(std::string location, std::map<std::string, bool>& visited, 
-                          std::unordered_map<std::string, std::vector<std::string> >&graph, 
-                          std::vector<std::string>& result);
+ 
 
   // Given a vector of location ids, it should reorder them such that the path
   // that covers all these points has the minimum length.
@@ -208,6 +194,24 @@ class TrojanMap {
   std::vector<bool> Queries(const std::vector<std::pair<double, std::vector<std::string>>> &q);
 
   //----------------------------------------------------- User-defined functions
+
+
+
+  std::vector<std::vector<std::string>>TravelingTrojan_Brute_force_helper( std::vector<std::string> &location_ids, int m, std::unordered_map<std::string, std::vector<std::vector<std::string>>> &memo);
+
+  std::string vectorToString(const std::vector<std::string> &vec);
+
+  void TravelingTrojan_Backtracking_helper(std::vector<std::string>& current,std::vector<std::string>& location_ids, std::pair<double, std::vector<std::vector<std::string>>>& records);
+
+   void DFS_Helper(std::string location, std::map<std::string, bool>& visited, 
+                          std::unordered_map<std::string, std::vector<std::string> >&graph, 
+                          std::vector<std::string>& result);
+
+   
+  //find the locaion exsit or not
+  bool FindLocationName(std::string location);
+
+  std::vector<std::string> GetAllLocationIDs();
 };
 
 #endif
