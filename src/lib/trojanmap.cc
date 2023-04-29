@@ -1306,17 +1306,17 @@ std::vector<std::string> TrojanMap::TrojanPath(std::vector<std::string> &locatio
   if (distance_A + distance_B < distance_A + distance_C && distance_A + distance_B < distance_B + distance_C) {
     std::vector<std::string> shortest_path = sub_path1;
     shortest_path.insert(shortest_path.end(), sub_path2.begin() + 1, sub_path2.end());
-    std::reverse(shortest_path.begin(), shortest_path.end());
+    // std::reverse(shortest_path.begin(), shortest_path.end());
     return shortest_path;
   } else if (distance_A + distance_C < distance_A + distance_B && distance_A + distance_C < distance_B + distance_C) {
     std::vector<std::string> shortest_path = sub_path3;
     shortest_path.insert(shortest_path.end(), sub_path1.begin() + 1, sub_path1.end());
-    std::reverse(shortest_path.begin(), shortest_path.end());
+    // std::reverse(shortest_path.begin(), shortest_path.end());
     return shortest_path;
   } else {
     std::vector<std::string> shortest_path = sub_path2;
     shortest_path.insert(shortest_path.end(), sub_path3.begin() + 1, sub_path3.end());
-    std::reverse(shortest_path.begin(), shortest_path.end());
+    // std::reverse(shortest_path.begin(), shortest_path.end());
     return shortest_path;
   }
 }
