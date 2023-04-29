@@ -209,12 +209,12 @@ class TrojanMap {
   //find the locaion exsit or not
   bool FindLocationName(std::string location);
 
-  std::vector<std::string> GetAllLocationIDs();
+  std::vector<std::string> TrojanMap::GetAllLocationIDs();
 
 
   //dfs
   bool dfs(std::string current_id,std::unordered_map<std::string, bool> &visited, std::string parent_id);
-//   int CountBits(int n);
+
   std::vector<std::string> ClockwiseOrder(std::vector<std::string> location_names);
 };
 
