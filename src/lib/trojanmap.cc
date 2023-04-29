@@ -1115,6 +1115,12 @@ std::vector<bool> TrojanMap::Queries(const std::vector<std::pair<double, std::ve
         std::string start_name = q[i].second[0];
         std::string end_name = q[i].second[1];
 
+        
+        if (!FindLocationName(start_name) || !FindLocationName(end_name)) {
+          ans[i] = false;
+          continue;
+        }
+
         std::vector<std::string> all_location_ids = GetAllLocationIDs();
         int num_locations = all_location_ids.size();
 
