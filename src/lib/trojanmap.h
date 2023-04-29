@@ -19,6 +19,45 @@
 #include <set>
 #include <vector>
 
+class ModifiedUnionFind {
+public:
+    ModifiedUnionFind(int size) {
+        for (int i = 0; i < size; ++i) {
+            parent.push_back(i);
+        }
+    }
+
+    int find(int x) {
+        if (parent[x] != x) {
+            parent[x] = find(parent[x]);
+        }
+        return parent[x];
+    }
+
+    void unite(int x, int y) {
+        int root_x = find(x);
+        int root_y = find(y);
+        if (root_x != root_y) {
+            parent[root_x] = root_y;
+        }
+    }
+
+private:
+    std::vector<int> parent;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
 // A Node is the location of one point in the map.
 class Node {
  public:
