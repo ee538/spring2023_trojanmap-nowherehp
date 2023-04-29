@@ -1252,6 +1252,37 @@ std::vector<std::string> TrojanMap::FindNearby(std::string attributesName, std::
 // return shortest_path;
 
 // }
+std::vector<std::string> TrojanMap::ClockwiseOrder(std::vector<std::string> location_names) {
+  // Check if all locations are valid
+  for (const auto& loc : location_names) {
+    if (!FindLocationName(loc)) {
+      std::cout << loc << " is not a valid location." << std::endl;
+      return {};
+    }
+  }
+
+  // Get the latitude and longitude of each location
+  double lat1 = GetLat(GetID(location_names[0]));
+  double lon1 = GetLon(GetID(location_names[0]));
+  double lat2 = GetLat(GetID(location_names[1]));
+  double lon2 = GetLon(GetID(location_names[1]));
+  double lat3 = GetLat(GetID(location_names[2]));
+  double lon3 = GetLon(GetID(location_names[2]));
+
+  // Calculate the cross product of the vectors from location 1 to locations 2 and 3
+  double cross_product = (lat2 - lat1) * (lon3 - lon1) - (lat3 - lat1) * (lon2 - lon1);
+
+  // Determine the order of the locations based on the sign of the cross product
+  if (cross_product > 0) {
+    // Locations are in clockwise order
+    return location_names;
+  } else {
+    // Locations are in counterclockwise order, swap the second and third locations
+    std::vector<std::string> clockwise_order = {location_names[0], location_names[2], location_names[1]};
+    return clockwise_order;
+  }
+}
+
 
 std::vector<std::string> TrojanMap::TrojanPath(std::vector<std::string> &location_names) {
   // Check if all locations are valid
@@ -1261,13 +1292,14 @@ std::vector<std::string> TrojanMap::TrojanPath(std::vector<std::string> &locatio
       return {};
     }
   }
-
+  
+  std::vector<std::string> A = ClockwiseOrder(location_names);
   // Calculate the distances between the three locations
-  std::vector<std::string> sub_path1 = CalculateShortestPath_Dijkstra(location_names[0], location_names[1]);
+  std::vector<std::string> sub_path1 = CalculateShortestPath_Dijkstra(A[0], A[1]);
   double distance_A = CalculatePathLength(sub_path1);
-  std::vector<std::string> sub_path2 = CalculateShortestPath_Dijkstra(location_names[1], location_names[2]);
+  std::vector<std::string> sub_path2 = CalculateShortestPath_Dijkstra(A[1], A[2]);
   double distance_B = CalculatePathLength(sub_path2);
-  std::vector<std::string> sub_path3 = CalculateShortestPath_Dijkstra(location_names[0], location_names[2]);
+  std::vector<std::string> sub_path3 = CalculateShortestPath_Dijkstra(A[0], A[2]);
   double distance_C = CalculatePathLength(sub_path3);
 
   // Compare the distances and select the shortest path
