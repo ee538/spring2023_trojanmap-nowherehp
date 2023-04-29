@@ -1,5 +1,36 @@
 #include "trojanmap.h"
 
+
+
+
+
+class ModifiedUnionFind {
+public:
+    ModifiedUnionFind(int size) {
+        for (int i = 0; i < size; ++i) {
+            parent.push_back(i);
+        }
+    }
+
+    int find(int x) {
+        if (parent[x] != x) {
+            parent[x] = find(parent[x]);
+        }
+        return parent[x];
+    }
+
+    void unite(int x, int y) {
+        int root_x = find(x);
+        int root_y = find(y);
+        if (root_x != root_y) {
+            parent[root_x] = root_y;
+        }
+    }
+
+private:
+    std::vector<int> parent;
+};
+
 //-----------------------------------------------------
 // TODO: Students should implement the following:
 //-----------------------------------------------------
@@ -98,7 +129,16 @@ std::string TrojanMap::GetID(const std::string &name) {
   
 }
 
+std::vector<std::string> TrojanMap::GetAllLocationIDs(){
+  std::vector<std::string> all_location_ids;
 
+  for (auto it = data.begin(); it != data.end(); it++) {
+    all_location_ids.push_back(it->first);
+  }
+
+  return all_location_ids;
+
+}
 
 
 // phase1
@@ -815,8 +855,33 @@ std::vector<std::string> TrojanMap::FindNearby(std::string attributesName, std::
  */
 std::vector<std::string> TrojanMap::TrojanPath(
       std::vector<std::string> &location_names) {
-    std::vector<std::string> res;
-    return res;
+        std::vector<std::string> shortest_path;
+          double min_distance = std::numeric_limits<double>::max();
+
+  // Get all the permutations of the given locations
+  std::vector<std::vector<std::string>> permutations;
+  std::sort(location_names.begin(), location_names.end());
+  do {
+    permutations.push_back(location_names);
+  } while (std::next_permutation(location_names.begin(), location_names.end()));
+
+  // Iterate through each permutation and calculate its total distance using Dijkstra's algorithm
+  for (const auto &path : permutations) {
+    double total_distance = 0;
+    for (size_t i = 0; i < path.size() - 1; ++i) {
+      // Calculate the shortest path between two consecutive locations in the current permutation
+      std::vector<std::string> sub_path = CalculateShortestPath_Dijkstra(path[i], path[i + 1]);
+      // Add the distance of the shortest path to the total distance
+      total_distance += CalculatePathLength(sub_path);
+    }
+    // If the total distance is less than the minimum distance found so far, update the result
+    if (total_distance < min_distance) {
+      min_distance = total_distance;
+      shortest_path = path;
+    }
+  }
+
+  return shortest_path;
 }
 
 /**
@@ -826,7 +891,41 @@ std::vector<std::string> TrojanMap::TrojanPath(
  * @return {std::vector<bool> }      : existence of the path
  */
 std::vector<bool> TrojanMap::Queries(const std::vector<std::pair<double, std::vector<std::string>>>& q) {
+
     std::vector<bool> ans(q.size());
+    
+    for (const auto& query : q) {
+        double max_distance = query.first;
+        std::string start_name = query.second[0];
+        std::string end_name = query.second[1];
+
+        std::vector<std::string> all_location_ids = GetAllLocationIDs();
+        int num_locations = all_location_ids.size();
+
+        ModifiedUnionFind uf(num_locations);
+        std::unordered_map<std::string, int> id_to_index;
+
+        for (int i = 0; i < num_locations; ++i) {
+            id_to_index[all_location_ids[i]] = i;
+        }
+
+        for (int i = 0; i < num_locations; ++i) {
+            std::string id1 = all_location_ids[i];
+            std::vector<std::string> neighbors = GetNeighborIDs(id1);
+            for (const std::string& id2 : neighbors) {
+                if (CalculateDistance(id1, id2) <= max_distance) {
+                    uf.unite(id_to_index[id1], id_to_index[id2]);
+                }
+            }
+        }
+
+        std::string start_id = GetID(start_name);
+        std::string end_id = GetID(end_name);
+
+        ans.push_back(uf.find(id_to_index[start_id]) == uf.find(id_to_index[end_id]));
+    }
+
+
     return ans;
 }
 
@@ -858,6 +957,7 @@ void TrojanMap::CreateGraphFromCSVFile() {
       else if (count == 2)
         n.lon = stod(word);
       else if (count == 3)
+
         n.name = word;
       else {
         word.erase(std::remove(word.begin(), word.end(), ' '), word.end());

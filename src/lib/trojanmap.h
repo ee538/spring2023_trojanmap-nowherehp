@@ -70,6 +70,8 @@ class TrojanMap {
   //find the locaion exsit or not
   bool FindLocationName(std::string location);
 
+  std::vector<std::string> GetAllLocationIDs();
+
   // Get the neighbor ids of a Node.
   std::vector<std::string> GetNeighborIDs(const std::string &id);
 
