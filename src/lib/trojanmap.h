@@ -195,11 +195,11 @@ class TrojanMap {
 
 
 
-  std::vector<std::vector<std::string>>TravelingTrojan_Brute_force_helper( std::vector<std::string> &location_ids, int m, std::unordered_map<std::string, std::vector<std::vector<std::string>>> &memo);
+   std::vector<std::vector<std::string>>TravelingTrojan_Brute_force_helper( std::vector<std::string> &location_ids, int m, std::unordered_map<std::string, std::vector<std::vector<std::string>>> &memo);
 
-  std::string vectorToString(const std::vector<std::string> &vec);
+   std::string vectorToString(const std::vector<std::string> &vec);
 
-  void TravelingTrojan_Backtracking_helper(std::vector<std::string>& current,std::vector<std::string>& location_ids, std::pair<double, std::vector<std::vector<std::string>>>& records);
+   void TravelingTrojan_Backtracking_helper(std::vector<std::string>& current,std::vector<std::string>& location_ids, std::pair<double, std::vector<std::vector<std::string>>>& records);
 
    void DFS_Helper(std::string location, std::map<std::string, bool>& visited, 
                           std::unordered_map<std::string, std::vector<std::string> >&graph, 
@@ -208,13 +208,10 @@ class TrojanMap {
    
   //find the locaion exsit or not
   bool FindLocationName(std::string location);
-
   std::vector<std::string> TrojanMap::GetAllLocationIDs();
-
 
   //dfs
   bool dfs(std::string current_id,std::unordered_map<std::string, bool> &visited, std::string parent_id);
-
   std::vector<std::string> ClockwiseOrder(std::vector<std::string> location_names);
 };
 

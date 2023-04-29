@@ -3,34 +3,6 @@
 
 
 
-
-// class ModifiedUnionFind {
-// public:
-//     ModifiedUnionFind(int size) {
-//         for (int i = 0; i < size; ++i) {
-//             parent.push_back(i);
-//         }
-//     }
-
-//     int find(int x) {
-//         if (parent[x] != x) {
-//             parent[x] = find(parent[x]);
-//         }
-//         return parent[x];
-//     }
-
-//     void unite(int x, int y) {
-//         int root_x = find(x);
-//         int root_y = find(y);
-//         if (root_x != root_y) {
-//             parent[root_x] = root_y;
-//         }
-//     }
-
-// private:
-//     std::vector<int> parent;
-// };
-
 //-----------------------------------------------------
 // TODO: Students should implement the following:
 //-----------------------------------------------------
@@ -1251,7 +1223,7 @@ std::vector<std::string> TrojanMap::FindNearby(std::string attributesName, std::
 // // Return the shortest path
 // return shortest_path;
 
-// }
+// } 
 std::vector<std::string> TrojanMap::ClockwiseOrder(std::vector<std::string> location_names) {
   // Check if all locations are valid
   for (const auto& loc : location_names) {
