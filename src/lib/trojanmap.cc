@@ -1100,6 +1100,45 @@ std::vector<std::string> TrojanMap::FindNearby(std::string attributesName, std::
 //   return shortest_path;
 // }
 
+std::vector<std::string> TrojanMap::TrojanPath(std::vector<std::string> &location_names) {
+  std::vector<std::string> current_path = location_names;
+
+  // Calculate the initial path length
+  double current_path_length = 0;
+  for (size_t i = 0; i < location_names.size() - 1; ++i) {
+    std::vector<std::string> sub_path = CalculateShortestPath_Dijkstra(location_names[i], location_names[i + 1]);
+    current_path_length += CalculatePathLength(sub_path);
+  }
+
+  bool improvement = true;
+  while (improvement) {
+    improvement = false;
+
+    for (size_t i = 1; i < location_names.size() - 1; ++i) {
+      for (size_t j = i + 1; j < location_names.size(); ++j) {
+        // Swap nodes i and j to create a new candidate path
+        std::vector<std::string> candidate_path = current_path;
+        std::reverse(candidate_path.begin() + i, candidate_path.begin() + j + 1);
+
+        // Calculate the candidate path length
+        double candidate_path_length = 0;
+        for (size_t k = 0; k < location_names.size() - 1; ++k) {
+          std::vector<std::string> sub_path = CalculateShortestPath_Dijkstra(candidate_path[k], candidate_path[k + 1]);
+          candidate_path_length += CalculatePathLength(sub_path);
+        }
+
+        // If the candidate path is shorter, update the current path
+        if (candidate_path_length < current_path_length) {
+          current_path_length = candidate_path_length;
+          current_path = candidate_path;
+          improvement = true;
+        }
+      }
+    }
+  }
+
+  return current_path;
+}
 
 /**
  * Given a vector of queries, find whether there is a path between the two locations with the constraint of the gas tank.

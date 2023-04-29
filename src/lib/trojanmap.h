@@ -184,8 +184,6 @@ class TrojanMap {
   bool CycleDetection(std::vector<std::string> &subgraph,
                       std::vector<double> &square);
 
-  //dfs
-  bool dfs(std::string current_id,std::unordered_map<std::string, bool> &visited, std::string parent_id);
   // Given a location id and k, find the k closest points on the map
   std::vector<std::string> FindNearby(std::string, std::string, double, int);
   
@@ -212,6 +210,10 @@ class TrojanMap {
   bool FindLocationName(std::string location);
 
   std::vector<std::string> GetAllLocationIDs();
+
+
+  //dfs
+  bool dfs(std::string current_id,std::unordered_map<std::string, bool> &visited, std::string parent_id);
 };
 
 #endif
