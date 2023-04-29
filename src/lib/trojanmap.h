@@ -214,6 +214,7 @@ class TrojanMap {
 
   //dfs
   bool dfs(std::string current_id,std::unordered_map<std::string, bool> &visited, std::string parent_id);
+  int CountBits(int n);
 };
 
 #endif
